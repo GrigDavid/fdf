@@ -28,14 +28,98 @@ void	gpt_wrote_this(void *mlx, void *win)
 
 }
 
-void	draw_point(t_params *params, int point[4])
+void	draw_line(t_params *params, t_point *a, t_point *b)
 {
 	int	x;
 	int	y;
+	int	d;
+	int	color = 0xffffff;
+
+	x = a->x;
+	y = a->y;//if both points are on the same x or y this crashes
+	d = 2 * (b->y - a->y) - (b->x - a->x);
+	ft_putnbr_fd(a->x, 1);
+	write(1, "\n", 1);
+	ft_putnbr_fd(b->x, 1);
+	write(1, "\n", 1);
+
+	ft_putnbr_fd(a->y, 1);
+	write(1, "\n", 1);
+	ft_putnbr_fd(b->y, 1);
+	write(1, "\n", 1);
 	
-	x = floor((point[1] - point[0]) * sqrt(3) / 2 * (params->pixel / 8)); //sqrt3 / 2 = sin(PI / 3)
-	y = floor(-point[2] + (point[0] + point[1]) / 2) * params->row_len; //  1/2 = cos(PI / 3)
-	*(unsigned int *)(params->address + y + x) = point[3];
+	while (x <= b->x)
+	{
+		*(unsigned int *)(params->address + y * params->row_len + x * (params->pixel / 8)) = color;
+		// ft_putnbr_fd(x, 1);
+		// write(1, "\n", 1);
+		// ft_putnbr_fd(y, 1);
+		// write(1, "\n", 1);
+		if (d > 0)
+		{
+			y++;
+			d -= 2 * (b->x - a->x);
+		}
+		d += 2 * (b->y - a->y);
+		x++;
+	}ft_putstr_fd("hasa\n", 1);
+	/*
+	ft_putnbr_fd(a->x, 1);
+	write(1, "\n", 1);
+	ft_putnbr_fd(a->y, 1);
+	write(1, "\n", 1);
+	ft_putnbr_fd(b->x, 1);
+	write(1, "\n", 1);
+	ft_putnbr_fd(b->y, 1);
+	write(1, "\n", 1);*/
+	// if (a->x > b->y)
+	// {
+	/*	x = a->x;
+		while (x < b->x)
+		{
+			y = ceil((b->y - a->y) * (x - a->x) / (b->x - a->x)) + a->y;
+			*(unsigned int *)(params->address + y * params->row_len + x * (params->pixel / 8)) = color;
+
+			ft_putnbr_fd(x, 1);
+			write(1, "\n", 1);
+
+			ft_putnbr_fd(y, 1);
+			write(1, "\n", 1);
+			x++;
+		}*/
+	// }
+	// else
+	// {
+	// 	x = b->x;
+	// 	while (x < a->x)
+	// 	{
+	// 		y = (a->y - b->y) * (x - b->x) / (a->x - b->x) + b->y;
+	// 		*(unsigned int *)(params->address + y * params->row_len + x * (params->pixel / 8)) = color;
+	// 		x++;
+	// 	}
+	// }
+	//*(unsigned int *)(params->address + y * params->row_len + x * (params->pixel / 8)) = color;
+}
+
+t_point	*get_point(t_params *params, int point[4])
+{
+	int	xo;
+	int	yo;
+	t_point	*dot;
+
+	dot = (t_point *)malloc(sizeof(t_point));
+	if (!dot)
+		return (NULL);
+	xo = params->width / 2;
+	yo = params->height / 2;
+	dot->x = floor(((point[1] - point[0]) * sqrt(3) / 2  + xo)); //sqrt3 / 2 = sin(PI / 3)
+	dot->y = floor(-point[2] + (point[0] + point[1]) / 2 + yo); //  1/2 = cos(PI / 3)
+	// ft_putnbr_fd(dot->x, 1);
+	// write(1, "\n", 1);
+	// ft_putnbr_fd(dot->y, 1);
+	// write(1, "\n", 1);
+	dot->color = point[3];
+	return (dot);
 	//mlx_put_image_to_window(params->mlx, params->win, params->img, 0, 0);
 }
 
@@ -43,15 +127,12 @@ void	draw_point(t_params *params, int point[4])
 int	main(void) //use xev for keyboard codes
 {
 	t_params	*params;
-	int	*point;
+	int	a[] = {210, 100, 50, 0xffffff};
+	int	b[] = {0, 0, 0, 0xffffff};
 
-	point = (int *)malloc(sizeof(int) * 4);
-	if (!point)
-		return (0);
-	point[0] = 100;
-	point[1] = 500;
-	point[2] = 100;
-	point[3] = 0x00eaff;
+	// a = (int *)malloc(sizeof(int) * 4);
+	// b = (int *)malloc(sizeof(int) * 4);
+	// a
 	params = (t_params *)malloc(sizeof(t_params));
 	if (!params)
 		return (0);
@@ -62,12 +143,12 @@ int	main(void) //use xev for keyboard codes
 	params->img = mlx_new_image(params->mlx, params->width, params->height);
 	params->address = mlx_get_data_addr(params->img, &(params->pixel), &(params->row_len), &(params->endian));
     //gpt_wrote_this(mlx, win);
-	//did_I_cook(params.mlx, params.win);
-	while (point[0] < 200)
-	{
-		draw_point(params, point);
-		point[0]++;
-	}
+	// while (point[0] < 200)
+	// {
+	// 	draw_point(params, point);
+	// 	point[0]++;
+	// }
+	draw_line(params, get_point(params, a), get_point(params, b));
 	mlx_put_image_to_window(params->mlx, params->win, params->img, 0, 0);
     mlx_loop(params->mlx);
 }

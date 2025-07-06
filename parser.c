@@ -28,8 +28,8 @@ int	ft_atoh(char *str)
 	// int	i;
 
 	if (!ft_strchr(str, ','))
-		return (1); ///////////////////here will be coloring function in the future
-	return (1);     ///////////////////here will be str to hex converting function
+		return (0xffffff); ///////////////////here will be coloring function in the future
+	return (0xffffff);     ///////////////////here will be str to hex converting function
 }
 
 t_row	*gen_row(char **mat)
@@ -52,7 +52,7 @@ t_row	*gen_row(char **mat)
 	while (i < len)
 	{
 		height[i] = ft_atoi(mat[i]); //for now, I'm not checking wether the map is valid, if its not, the element is just set to 0 
-		color[i] = ft_atoh(mat[i]);  //this function is not done and for now just returns 1(white)
+		color[i] = ft_atoh(mat[i]);  //this function is not done and for now just returns white
 		i++;
 	}
 	return (ft_rownew(height, color, len));
