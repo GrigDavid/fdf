@@ -6,7 +6,7 @@
 /*   By: dgrigor2 <dgrigor2@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/01 19:01:18 by dgrigor2          #+#    #+#             */
-/*   Updated: 2025/07/05 17:12:33 by dgrigor2         ###   ########.fr       */
+/*   Updated: 2025/07/08 13:24:28 by dgrigor2         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,6 +16,8 @@ void	ft_rowadd_back(t_row **row, t_row *new)
 {
 	if (!new)
 		return ;
+	if (!row)
+		row = &new;
 	if (!*row)
 		*row = new;
 	else

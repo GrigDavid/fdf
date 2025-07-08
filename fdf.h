@@ -1,13 +1,13 @@
 #ifndef FDF_H
 # define FDF_H
 
-typedef struct s_row
-{
-	int				*height;
-	int				*color;
-	int				len;
-	struct s_row	*next;
-}	t_row;
+// typedef struct s_row
+// {
+// 	int				*height;
+// 	int				*color;
+// 	int				len;
+// 	struct s_row	*next;
+// }	t_row;
 
 typedef struct s_params
 {
@@ -29,6 +29,15 @@ typedef struct s_point
 	int	color;
 }	t_point;
 
+typedef struct s_row
+{
+	int	x;
+	int	y;
+	int	z;
+	int	color;
+	struct s_row	*next;
+}	t_row;
+
 # include "./mlx/mlx.h"
 # include "./libft/libft.h"
 # include <fcntl.h>
@@ -41,7 +50,8 @@ void	ft_rowadd_front(t_row **row, t_row *new);
 void	ft_rowclear(t_row **row);
 void	ft_rowdelone(t_row *row);
 t_row	*ft_rowlast(t_row *row);
-t_row	*ft_rownew(int *height, int *color, int len);
+t_row	*ft_rownew(int x, int y, int z, int color);
 int	ft_rowsize(t_row *row);
+t_row	*parser(char *name);
 
 #endif

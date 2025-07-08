@@ -6,7 +6,7 @@
 /*   By: dgrigor2 <dgrigor2@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/03 14:53:43 by dgrigor2          #+#    #+#             */
-/*   Updated: 2025/07/05 17:12:47 by dgrigor2         ###   ########.fr       */
+/*   Updated: 2025/07/08 13:00:29 by dgrigor2         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,7 +14,5 @@
 
 void	ft_rowdelone(t_row *row)
 {
-	free(row->height);
-	free(row->color);
 	free (row);
 }
