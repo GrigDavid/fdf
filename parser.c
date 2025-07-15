@@ -26,7 +26,7 @@ t_row	*parser(char *name)
 	int		x;
 	int		y;
 	char	*tmp;
-	char	*tmp_cpy;
+	//char	*tmp_cpy;
 	t_row	*res;
 
 	res = NULL;
@@ -38,11 +38,11 @@ t_row	*parser(char *name)
 	tmp = get_next_line(fd);
 	if (!tmp)
 		return (NULL);
-	tmp_cpy = tmp;
+	//ft_printf("yep... that's an issue");
 	while (tmp)
 	{
 		ft_rowadd_back(&res, ft_rownew(x, y, ft_atoi(tmp), ft_atoh(tmp)));
-
+		//ft_printf("inch ka%d - %d\n", x, y);
 		if (!jump(tmp))
 		{
 			y++;
@@ -55,7 +55,7 @@ t_row	*parser(char *name)
 			tmp = jump(tmp) + 1;
 		}
 	}
-	//write(1, "nigga", 5);
 	close (fd);
 	return (res);
 }
+

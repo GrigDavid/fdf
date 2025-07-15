@@ -1,97 +1,70 @@
 #include "fdf.h"
 
-void	gpt_wrote_this(void *mlx, void *win)
-{
-	void *img;         // Image buffer
-    char *img_addr;    // Image data address
-    int bits_per_pixel;
-    int line_length;
-    int endian;
-
-    int width = 800;
-    int height = 600;
-	// Create an image
-    img = mlx_new_image(mlx, width, height);
-
-    // Get the image data address
-    img_addr = mlx_get_data_addr(img, &bits_per_pixel, &line_length, &endian);
-
-    // Draw a red pixel at (400, 300)
-    int x = 0;
-    int y = 0;
-    int color = 0x00eaff; // Red in hex (RRGGBB)
-	while (x++ < 400)
-    	*(unsigned int *)(img_addr + y * line_length + x * (bits_per_pixel / 8)) = color;
-
-    // Put the image to the window
-    mlx_put_image_to_window(mlx, win, img, 0, 0);
-
-}
-
-void	draw_line(t_params params, t_point *a, t_point *b)
-{
-	int	dx = b->x - a->x; //-86
-	int	dy = b->y - a->y; //120
-	int	i;
-	int	x;
-	int	y;
-	int	p;
-
-	if (dx > 0)
-	{
-		draw_line(params, b, a);
-		return ;
-	}
-	if (dx)
-	{
-		x = a->x;
-		y = a->y;
-		p = 2 * dy - dx; //326
-		i = 0;
-		while (i > dx)
-		{
-			*(unsigned int *)(params.address + y * params.row_len + (x + i) * (params.pixel / 8)) = a->color;
-			if (p > 0)
-			{
-				y++;
-				p += 2 * dy - 2 * dx;
-			}
-			else
-				p += 2 * dy;
-			i--;
-		}
-	}
-	
-}
 
 t_point	*get_point(t_params params, t_row *point)
 {
 	int	xo;
 	int	yo;
 	t_point	*dot;
+	int	coef;
 
+	coef = 40;
 	dot = (t_point *)malloc(sizeof(t_point));
 	if (!dot)
 		return (NULL);
 	xo = params.width / 2;
 	yo = params.height / 2;
-	dot->x = 10 * ((point->y - point->x) * sqrt(3) / 2)  + xo; //sqrt3 / 2 = sin(PI / 3)
-	dot->y = 10 * (-point->z + (point->x + point->y) / 2) + yo; //  1/2 = cos(PI / 3)
+	dot->x = coef * (-(point->y - point->x) * sqrt(3) / 2)  + xo; //sqrt3 / 2 = sin(PI / 3)
+	dot->y = coef * (-point->z + (point->x + point->y) / 2) + yo; //  1/2 = cos(PI / 3)
 	// dot->x = fma(point->y - point->x, sqrt(3) / 2, params.width / 2);
 	// dot->y = fma(point->x + point->y, 2, params.height / 2 - point->z);
 	ft_putnbr_fd(dot->x, 1);
 	write(1, "\n", 1);
 	ft_putnbr_fd(dot->y, 1);
 	write(1, "\n\n", 2);
+	int fd = open("dots", O_WRONLY | O_APPEND);
+	write (fd, "(", 1);
+	ft_putnbr_fd(dot->x, fd);
+	write(fd, ", ", 2);
+	ft_putnbr_fd(dot->y, fd);
+	write(fd, "), ", 3);
+	close(fd);
+
 	dot->color = point->color;
 	return (dot);
-	//mlx_put_image_to_window(params->mlx, params->win, params->img, 0, 0);
+}
+
+void	get_neighbours(t_params params, t_row **map, t_row *point)
+{
+	t_row	*tmp;
+
+	tmp = *map;
+	if (!point->x && !point->y)
+		return ;
+	if (point->y)
+	{
+		while (tmp && tmp->y != (point->y) - 1 && tmp->x != point->x)
+			tmp = tmp->next;
+		if (tmp)
+			draw_line(params, get_point(params, tmp), get_point(params, point));
+	}
+	tmp = *map;
+	if (point->x)
+	{
+		while (tmp && tmp->x != (point->x) - 1 && tmp->y != point->y)
+			tmp = tmp->next;
+		if (tmp)
+			draw_line(params, get_point(params, tmp), get_point(params, point));
+	}
 }
 
 
-int	main(void) //use xev for keyboard codes
+
+int	main(int argc, char **argv) //use xev for keyboard codes
 {
 	t_params	params;
+	if (argc != 2)
+		return (0);
 	// int	a[] = {210, 100, 50, 0xffffff};
 	// int	b[] = {0, 0, 0, 0xffffff};
 
@@ -99,25 +72,46 @@ int	main(void) //use xev for keyboard codes
 	// b = (int *)malloc(sizeof(int) * 4);
 	// a
 	params.mlx = mlx_init();
-	params.height = 1000;
-	params.width = 1000;
-    params.win = mlx_new_window(params.mlx, params.width, params.height, "FBI Kennedy assasination files");
-	params.img = mlx_new_image(params.mlx, params.width, params.height);
-	params.address = mlx_get_data_addr(params.img, &(params.pixel), &(params.row_len), &(params.endian));
-    
-	// t_row	*map1 = ft_rownew(0, 0, 0, 0xffffff);
-	// t_row	*map2 = ft_rownew(0, 100, 170, 0xffffff);
-	// draw_line(params, get_point(params, map1), get_point(params, map2));
-	t_row	*map = parser("test_maps/hopar.fdf");
-	while (map->next)
+	if (!params.mlx)
 	{
-		//ft_putnbr_fd(i++, 1);
-		draw_line(params, get_point(params, map), get_point(params, map->next));
-		map = map->next;
+		ft_printf("mlx failed\n");
+		return (0);
 	}
-	//draw_line(params, get_point(params, a), get_point(params, b));
+	params.height = 1800;
+	params.width = 1800;
+	params.win = mlx_new_window(params.mlx, params.width, params.height, "FBI Kennedy assasination files");
+	if (!params.win)
+	{
+		ft_printf("window creation failed\n");
+		return (0);
+	}
+	params.img = mlx_new_image(params.mlx, params.width, params.height);
+	if (!params.img)
+	{
+		ft_printf("image creation failed\n");
+		return (0);
+	}
+	params.address = mlx_get_data_addr(params.img, &(params.pixel), &(params.row_len), &(params.endian));
+	if (!params.address)
+	{
+		ft_printf("address creation failed\n");
+		return (0);
+	}
+	/*t_row	*map1 = ft_rownew(0, 0, 0, 0xffffff);
+	t_row	*map2 = ft_rownew(0, 10, 17, 0xffffff);
+	draw_line(params, get_point(params, map1), get_point(params, map2));*/
+	t_row	*map = parser(argv[1]);
+	t_row	*tmp = map;
+	while (tmp)
+	{
+		get_neighbours(params, &map, tmp);
+		tmp = tmp->next;
+	}
+	/*t_point	a = {100, 33, 0xffffff};
+	t_point b = {457, 100, 0xffffff};
+	draw_line(params, &a, &b);*/
 	mlx_put_image_to_window(params.mlx, params.win, params.img, 0, 0);
-    mlx_loop(params.mlx);
+	mlx_loop(params.mlx);
 }
 
 //gpt_wrote_this(mlx, win);
@@ -179,3 +173,75 @@ int	main(void) //use xev for keyboard codes
 }
 
 */
+
+/*
+void	gpt_wrote_this(void *mlx, void *win)
+{
+	void *img;         // Image buffer
+    char *img_addr;    // Image data address
+    int bits_per_pixel;
+    int line_length;
+    int endian;
+
+    int width = 800;
+    int height = 600;
+	// Create an image
+    img = mlx_new_image(mlx, width, height);
+
+    // Get the image data address
+    img_addr = mlx_get_data_addr(img, &bits_per_pixel, &line_length, &endian);
+
+    // Draw a red pixel at (400, 300)
+    int x = 0;
+    int y = 0;
+    int color = 0x00eaff; // Red in hex (RRGGBB)
+	while (x++ < 400)
+    	*(unsigned int *)(img_addr + y * line_length + x * (bits_per_pixel / 8)) = color;
+
+    // Put the image to the window
+    mlx_put_image_to_window(mlx, win, img, 0, 0);
+
+}
+*/
+
+/*
+void	draw_line(t_params params, t_point *a, t_point *b)
+{
+	int	dx = b->x - a->x;
+	int	dy = b->y - a->y;
+	int	i;
+	int	x;
+	int	y;
+	int	p;
+
+	if (dx < 0)
+	{
+		draw_line(params, b, a);
+		return ;
+	}
+	if (dx)
+	{
+		ft_printf("now we rollin %d\n", dx);
+		x = a->x;
+		y = a->y;
+		p = 2 * dy - dx;
+		i = 0;
+		while (i < dx)
+		{
+			*(unsigned int *)(params.address + y * params.row_len + (x + i) * (params.pixel / 8)) = 0xffffff;
+			ft_printf("x is %d\ny in %d\n\n", x + i, y);
+			p += 2 * dy;
+			if (p > 0)
+			{
+				if (dy > 0)
+					y++;
+				else
+					y--;
+				p -=  2 * dx;
+			}
+			i++;
+		}
+	}
+	
+}*/
+

@@ -38,10 +38,11 @@ typedef struct s_row
 	struct s_row	*next;
 }	t_row;
 
-# include "./mlx/mlx.h"
+# include "./minilibx-linux/mlx.h"
 # include "./libft/libft.h"
 # include <fcntl.h>
 # include <math.h>
+# include "./ft_printf/ft_printf.h"
 
 t_row	*parser(char *name);
 
@@ -53,5 +54,8 @@ t_row	*ft_rowlast(t_row *row);
 t_row	*ft_rownew(int x, int y, int z, int color);
 int	ft_rowsize(t_row *row);
 t_row	*parser(char *name);
+void	draw_line(t_params params, t_point *a, t_point *b);
+
 
 #endif
+
