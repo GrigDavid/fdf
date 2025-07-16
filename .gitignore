@@ -1,6 +1,7 @@
 *.o
 mlx
 mlx_linux
+minilibx-linux
 fdf
 libft
 test_maps

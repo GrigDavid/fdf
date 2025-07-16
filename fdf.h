@@ -58,4 +58,3 @@ void	draw_line(t_params params, t_point *a, t_point *b);
 
 
 #endif
-

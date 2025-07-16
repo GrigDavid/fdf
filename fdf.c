@@ -1,6 +1,5 @@
 #include "fdf.h"
 
-
 t_point	*get_point(t_params params, t_row *point)
 {
 	int	xo;
@@ -8,30 +7,50 @@ t_point	*get_point(t_params params, t_row *point)
 	t_point	*dot;
 	int	coef;
 
-	coef = 40;
+	coef = 50;
 	dot = (t_point *)malloc(sizeof(t_point));
 	if (!dot)
 		return (NULL);
 	xo = params.width / 2;
 	yo = params.height / 2;
-	dot->x = coef * (-(point->y - point->x) * sqrt(3) / 2)  + xo; //sqrt3 / 2 = sin(PI / 3)
-	dot->y = coef * (-point->z + (point->x + point->y) / 2) + yo; //  1/2 = cos(PI / 3)
+	dot->x = (-(point->y - point->x) * ((coef *  sqrt(3)) / 2))  + xo; //sqrt3 / 2 = sin(PI / 3)
+	dot->y = coef * (-point->z + (point->x + point->y)) / 2 + yo; //  1/2 = cos(PI / 3)
 	// dot->x = fma(point->y - point->x, sqrt(3) / 2, params.width / 2);
 	// dot->y = fma(point->x + point->y, 2, params.height / 2 - point->z);
-	ft_putnbr_fd(dot->x, 1);
+	/*ft_putnbr_fd(dot->x, 1);
 	write(1, "\n", 1);
 	ft_putnbr_fd(dot->y, 1);
-	write(1, "\n\n", 2);
-	int fd = open("dots", O_WRONLY | O_APPEND);
+	write(1, "\n\n", 2);*/
+	/*int fd = open("dots", O_WRONLY | O_APPEND);
 	write (fd, "(", 1);
 	ft_putnbr_fd(dot->x, fd);
 	write(fd, ", ", 2);
 	ft_putnbr_fd(dot->y, fd);
 	write(fd, "), ", 3);
-	close(fd);
-
+	close(fd);*/
 	dot->color = point->color;
 	return (dot);
+}
+
+void	write_points(t_params params, t_row *map)
+{
+	int fd = open("dots", O_WRONLY | O_TRUNC);
+	t_point	*dot;
+
+	while (map)
+	{
+		dot = get_point(params, map);
+		write (fd, "(", 1);
+		ft_putnbr_fd(dot->x, fd);
+		write(fd, ", ", 2);
+		ft_putnbr_fd(dot->y, fd);
+		write(fd, ")", 1);
+		if (map->next)
+			write(fd, ", ", 2);
+		map = map->next;
+	}
+	close(fd);
+
 }
 
 void	get_neighbours(t_params params, t_row **map, t_row *point)
@@ -43,7 +62,7 @@ void	get_neighbours(t_params params, t_row **map, t_row *point)
 		return ;
 	if (point->y)
 	{
-		while (tmp && tmp->y != (point->y) - 1 && tmp->x != point->x)
+		while (tmp && (tmp->y != (point->y) - 1 || tmp->x != point->x))
 			tmp = tmp->next;
 		if (tmp)
 			draw_line(params, get_point(params, tmp), get_point(params, point));
@@ -51,14 +70,12 @@ void	get_neighbours(t_params params, t_row **map, t_row *point)
 	tmp = *map;
 	if (point->x)
 	{
-		while (tmp && tmp->x != (point->x) - 1 && tmp->y != point->y)
+		while (tmp && (tmp->x != (point->x) - 1 || tmp->y != point->y))
 			tmp = tmp->next;
 		if (tmp)
 			draw_line(params, get_point(params, tmp), get_point(params, point));
 	}
 }
-
-
 
 int	main(int argc, char **argv) //use xev for keyboard codes
 {
@@ -101,6 +118,7 @@ int	main(int argc, char **argv) //use xev for keyboard codes
 	t_row	*map2 = ft_rownew(0, 10, 17, 0xffffff);
 	draw_line(params, get_point(params, map1), get_point(params, map2));*/
 	t_row	*map = parser(argv[1]);
+	write_points(params, map);
 	t_row	*tmp = map;
 	while (tmp)
 	{
@@ -111,6 +129,7 @@ int	main(int argc, char **argv) //use xev for keyboard codes
 	t_point b = {457, 100, 0xffffff};
 	draw_line(params, &a, &b);*/
 	mlx_put_image_to_window(params.mlx, params.win, params.img, 0, 0);
+	//ft_printf("qanak: %d", ft_rowsize(map));
 	mlx_loop(params.mlx);
 }
 
