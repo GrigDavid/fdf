@@ -77,6 +77,25 @@ void	get_neighbours(t_params params, t_row **map, t_row *point)
 	}
 }
 
+
+int	press_x(t_params *params)
+{
+	mlx_destroy_window(params->mlx, params->win);
+	exit(0);
+	return (1);
+}
+
+
+int	press_q(int keycode, t_params *params)
+{
+	if (keycode == 113)
+	{
+		mlx_destroy_window(params->mlx, params->win);
+		exit(0);
+	}
+	return (1);
+}
+
 int	main(int argc, char **argv) //use xev for keyboard codes
 {
 	t_params	params;
@@ -130,7 +149,10 @@ int	main(int argc, char **argv) //use xev for keyboard codes
 	draw_line(params, &a, &b);*/
 	mlx_put_image_to_window(params.mlx, params.win, params.img, 0, 0);
 	//ft_printf("qanak: %d", ft_rowsize(map));
+	mlx_hook(params.win, 2, 1L<<0, press_q, &params);
+	mlx_hook(params.win, 17, 0, press_x, &params);
 	mlx_loop(params.mlx);
+	return (0);
 }
 
 //gpt_wrote_this(mlx, win);
