@@ -1,5 +1,25 @@
 #include "fdf.h"
 
+void	get_size(t_params *params, t_row *map)
+{
+	int	x_max;
+	int	y_max;
+	
+	x_max = map->x;
+	y_max = map->y;
+	while (map)
+	{
+		if (map->x > x_max)
+			x_max = map->x;
+		if (map->y > y_max)
+			y_max = map->y;
+		map = map->next;
+	}
+	params->width = x_max + 200;
+	params->width = y_max + 200;
+
+}
+
 t_point	*get_point(t_params params, t_row *point)
 {
 	int	xo;
@@ -96,9 +116,11 @@ int	press_q(int keycode, t_params *params)
 	return (1);
 }
 
-int	main(int argc, char **argv) //use xev for keyboard codes
+int	main(int argc, char **argv)
 {
 	t_params	params;
+	t_row	*map;
+
 	if (argc != 2)
 		return (0);
 	// int	a[] = {210, 100, 50, 0xffffff};
@@ -107,14 +129,18 @@ int	main(int argc, char **argv) //use xev for keyboard codes
 	// a = (int *)malloc(sizeof(int) * 4);
 	// b = (int *)malloc(sizeof(int) * 4);
 	// a
+		/*t_row	*map1 = ft_rownew(0, 0, 0, 0xffffff);
+	t_row	*map2 = ft_rownew(0, 10, 17, 0xffffff);
+	draw_line(params, get_point(params, map1), get_point(params, map2));*/
+	map = parser(argv[1]);
+	if (!map)
+		return (0);
 	params.mlx = mlx_init();
 	if (!params.mlx)
 	{
 		ft_printf("mlx failed\n");
 		return (0);
 	}
-	params.height = 1800;
-	params.width = 1800;
 	params.win = mlx_new_window(params.mlx, params.width, params.height, "FBI Kennedy assasination files");
 	if (!params.win)
 	{
@@ -133,11 +159,7 @@ int	main(int argc, char **argv) //use xev for keyboard codes
 		ft_printf("address creation failed\n");
 		return (0);
 	}
-	/*t_row	*map1 = ft_rownew(0, 0, 0, 0xffffff);
-	t_row	*map2 = ft_rownew(0, 10, 17, 0xffffff);
-	draw_line(params, get_point(params, map1), get_point(params, map2));*/
-	t_row	*map = parser(argv[1]);
-	write_points(params, map);
+	//write_points(params, map);
 	t_row	*tmp = map;
 	while (tmp)
 	{

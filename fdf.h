@@ -20,6 +20,7 @@ typedef struct s_params
 	int		endian;
 	int		height;
 	int		width;
+	int		scale;
 }	t_params;
 
 typedef struct s_point
