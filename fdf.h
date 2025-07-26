@@ -43,6 +43,7 @@ typedef struct s_row
 # include <fcntl.h>
 # include <math.h>
 # include "./ft_printf/ft_printf.h"
+# include <X11/keysym.h>
 
 t_row	*parser(char *name);
 

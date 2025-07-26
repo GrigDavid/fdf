@@ -88,7 +88,7 @@ int	press_x(t_params *params)
 
 int	press_q(int keycode, t_params *params)
 {
-	if (keycode == 113)
+	if (keycode == XK_Escape)
 	{
 		mlx_destroy_window(params->mlx, params->win);
 		exit(0);
