@@ -25,8 +25,8 @@ void	calibrate(t_params params, t_point *p)
 	int	xo;
 	int	yo;
 
-	xo = params.width / 2 - params.x_mid / 2;
-	yo = params.height / 2 - params.y_mid / 2;
+	xo = params.width / 2 - params.x_mid;
+	yo = params.height / 2 - params.y_mid;
 	p->x += xo;
 	p->y += yo;
 }
@@ -36,13 +36,22 @@ t_point	get_point(t_params params, t_row p, int cal)
 	t_point	dot;
 	int		coef;
 
-	coef = 50;
+	//coef = (params.width - 400) / params.x_mid;
+	coef = params.scale;
 	dot.x = ((p.x - p.y) * ((coef * sqrt(3)) / 2));
+	//dot.x = ((p.x - p.y) * ((coef * 866) / 200));
 	dot.y = coef * (-p.z + (p.x + p.y)) / 2;
 	dot.color = p.color;
 	dot.next = NULL;
-	if (cal)
+	if (cal){
 		calibrate(params, &dot);
+		if (dot.x >= params.width || dot.y >= params.height || dot.x < 0 || dot.y < 0)
+		{
+			dot.x = 0;
+			dot.y = 0;
+			dot.color = 0x000000;
+		}
+	}
 	return (dot);
 }
 
@@ -58,4 +67,5 @@ t_point	get_point(t_params params, t_row p, int cal)
 	write(fd, ", ", 2);
 	ft_putnbr_fd(dot->y, fd);
 	write(fd, "), ", 3);
-	close(fd);*/
+	close(fd);
+*/

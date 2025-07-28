@@ -8,11 +8,15 @@ int	get_size(t_params *params, t_row *map)
 	int		y_max;
 	t_point	p;
 
+	params->scale = 1;
+	if (!map)
+		return (0);
 	p = get_point(*params, *map, 0);
 	x_max = p.x;
 	y_max = p.y;
 	x_min = p.x;
 	y_min = p.y;
+	map = map->next;
 	while (map)
 	{
 		p = get_point(*params, *map, 0);
@@ -26,8 +30,10 @@ int	get_size(t_params *params, t_row *map)
 			y_min = p.y;
 		map = map->next;
 	}
-	params->x_mid = (x_max + x_min) / 2;
-	params->y_mid = (y_max + y_min) / 2;
+	params->scale = 1800 / (x_max - x_min);
+	//params->scale = 50;
+	params->x_mid = params->scale * (x_max + x_min) / 2;
+	params->y_mid = params->scale * (y_max + y_min) / 2;
 	return (1);
 }
 
@@ -95,9 +101,7 @@ int	main(int argc, char **argv)
 	if (!map)
 		return (0);
 	if (!get_size(&params, map))
-	{
 		return (1);
-	}
 	params.win = mlx_new_window(params.mlx, params.width, params.height, "fdf");
 	if (!params.win)
 	{
