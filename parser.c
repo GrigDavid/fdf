@@ -71,7 +71,6 @@ t_row	*parser(char *name)
 	int		x;
 	int		y;
 	char	*tmp;
-	//char	*tmp_cpy;
 	t_row	*res;
 
 	res = NULL;
@@ -81,13 +80,46 @@ t_row	*parser(char *name)
 	if (fd < 0)
 		return (NULL);
 	tmp = get_next_line(fd);
-	if (!tmp)
+	name = tmp;
+	while (tmp)
+	{
+		ft_rowadd_back(&res, ft_rownew(x++, y, ft_atoi(tmp), get_hex(tmp))); //rownew malloc protection
+		if (!jump(tmp))
+		{
+			free(name);
+			y++;
+			x = 0;
+			tmp = get_next_line(fd);
+			name = tmp;
+		}
+		else
+			tmp = jump(tmp);
+	}
+	close (fd);
+	return (res);
+}
+
+/*
+t_point	*parser(t_params params, char *name)
+{
+	int		fd;
+	int		x;
+	int		y;
+	char	*tmp;
+	//char	*tmp_cpy;
+	t_point	*res;
+
+	res = NULL;
+	x = 0;
+	y = 0;
+	fd = open(name, O_RDONLY);
+	if (fd < 0)
 		return (NULL);
+	tmp = get_next_line(fd);
 	//ft_printf("yep... that's an issue");
 	while (tmp)
 	{
-		ft_rowadd_back(&res, ft_rownew(x, y, ft_atoi(tmp), get_hex(tmp)));
-		//ft_printf("inch ka%d - %d\n", x, y);
+		ft_pointadd_back(&res, ft_getpoint(params, x, y, ft_atoi(tmp), get_hex(tmp)));
 		if (!jump(tmp))
 		{
 			y++;
@@ -103,3 +135,4 @@ t_row	*parser(char *name)
 	close (fd);
 	return (res);
 }
+*/

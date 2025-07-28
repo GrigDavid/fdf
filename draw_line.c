@@ -1,16 +1,16 @@
 #include "fdf.h"
 
-void	plotLineLow(t_params params, t_point *a, t_point *b)
+void	plot_line_low(t_params params, t_point a, t_point b)
 {
 	int	dx;
-	int	dy;
+	int	dy; //remove dx dy, replace with respected expressions to save lines
 	int	i;
 	int	x;
 	int	y;
 	int	d;
 
-	dx = b->x - a->x;
-	dy = b->y - a->y;
+	dx = b.x - a.x;
+	dy = b.y - a.y;
 	i = 1;
 	if (dy < 0)
 	{
@@ -18,12 +18,12 @@ void	plotLineLow(t_params params, t_point *a, t_point *b)
 		dy = -dy;
 	}
 	d = 2 * dy - dx;
-	y = a->y;
-	x = a->x;
-	while (x <= b->x)
+	y = a.y;
+	x = a.x;
+	while (x <= b.x)
 	{
-		*(unsigned int *)(params.address + y * params.row_len + x * (params.pixel / 8)) = a->color;
-		if(d > 0)
+		*(unsigned int *)(params.address + y * params.row_len + x * (params.pixel / 8)) = a.color;
+		if (d > 0)
 		{
 			y += i;
 			d += 2 * (dy - dx);
@@ -32,10 +32,9 @@ void	plotLineLow(t_params params, t_point *a, t_point *b)
 			d += 2 * dy;
 		x++;
 	}
-
 }
 
-void	plotLineHigh(t_params params, t_point *a, t_point *b)
+void	plot_line_high(t_params params, t_point a, t_point b)
 {
 	int	dx;
 	int	dy;
@@ -44,8 +43,8 @@ void	plotLineHigh(t_params params, t_point *a, t_point *b)
 	int	y;
 	int	d;
 
-	dx = b->x - a->x;
-	dy = b->y - a->y;
+	dx = b.x - a.x;
+	dy = b.y - a.y;
 	i = 1;
 	if (dx < 0)
 	{
@@ -53,12 +52,12 @@ void	plotLineHigh(t_params params, t_point *a, t_point *b)
 		dx = -dx;
 	}
 	d = 2 * dx - dy;
-	y = a->y;
-	x = a->x;
-	while (y <= b->y)
+	y = a.y;
+	x = a.x;
+	while (y <= b.y)
 	{
-		*(unsigned int *)(params.address + y * params.row_len + x * (params.pixel / 8)) = a->color;
-		if(d > 0)
+		*(unsigned int *)(params.address + y * params.row_len + x * (params.pixel / 8)) = a.color;
+		if (d > 0)
 		{
 			x += i;
 			d += 2 * (dx - dy);
@@ -91,21 +90,21 @@ plotLineHigh(x0, y0, x1, y1)
         end if
 */
 
-void	draw_line(t_params params, t_point *a, t_point *b)
+void	draw_line(t_params params, t_point a, t_point b)
 {
-	if (abs(b->y - a->y) < abs(b->x - a->x))
+	if (abs(b.y - a.y) < abs(b.x - a.x))
 	{
-		if (a->x > b->x)
-			plotLineLow(params, b, a);
+		if (a.x > b.x)
+			plot_line_low(params, b, a);
 		else
-			plotLineLow(params, a, b);
+			plot_line_low(params, a, b);
 	}
 	else
 	{
-		if (a->y > b->y)
-			plotLineHigh(params, b, a);
+		if (a.y > b.y)
+			plot_line_high(params, b, a);
 		else
-			plotLineHigh(params, a, b);
+			plot_line_high(params, a, b);
 	}
 }
 /*
