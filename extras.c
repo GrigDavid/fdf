@@ -3,68 +3,83 @@
 /*                                                        :::      ::::::::   */
 /*   extras.c                                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: dgrigor2 <marvin@42.fr>                    +#+  +:+       +#+        */
+/*   By: dgrigor2 <dgrigor2@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2025/02/05 16:26:57 by dgrigor2          #+#    #+#             */
-/*   Updated: 2025/02/07 17:19:22 by dgrigor2         ###   ########.fr       */
+/*   Created: 2025/07/29 18:23:23 by dgrigor2          #+#    #+#             */
+/*   Updated: 2025/07/29 18:25:28 by dgrigor2         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "ft_printf.h"
+#include "fdf.h"
 
-int	ft_printchar(int c)
+static void	update_x(t_point p, int *xmin, int *xmax)
 {
-	return (write (1, &c, 1));
+	if (p.x > *xmax)
+		*xmax = p.x;
+	if (p.x < *xmin)
+		*xmin = p.x;
 }
 
-int	ft_printstr(char *s)
+static void	update_y(t_point p, int *ymin, int *ymax, t_row **map)
 {
-	if (!s)
-		return (write(1, "(null)", 6));
-	return (write(1, s, ft_strlen(s)));
+	if (p.y > *ymax)
+		*ymax = p.y;
+	if (p.y < *ymin)
+		*ymin = p.y;
+	*map = (*map)->next;
 }
 
-int	ft_printnbr(long n)
+int	get_size(t_params *params, t_row *map)
 {
-	char	zero;
-	int		len;
+	int		x_min;
+	int		x_max;
+	int		y_min;
+	int		y_max;
+	t_point	p;
 
-	len = 0;
-	zero = '0';
-	if (n == -2147483648)
-		return (write(1, "-2147483648", 11));
-	if (n < 0)
+	params->scale = 1;
+	if (!map)
+		return (0);
+	p = get_point(*params, *map, 0);
+	x_max = p.x;
+	y_max = p.y;
+	x_min = p.x;
+	y_min = p.y;
+	map = map->next;
+	while (map)
 	{
-		write(1, "-", 1);
-		return (ft_printnbr(-n) + 1);
+		p = get_point(*params, *map, 0);
+		update_x(p, &x_min, &x_max);
+		update_y(p, &y_min, &y_max, &map);
 	}
-	if (n < 10)
+	params->scale = 1800 / (x_max - x_min);
+	params->x_mid = params->scale * (x_max + x_min) / 2;
+	params->y_mid = params->scale * (y_max + y_min) / 2;
+	return (1);
+}
+
+void	get_neighbours(t_params params, t_row **map, t_row *point)
+{
+	t_row	*tmp;
+
+	tmp = *map;
+	if (!point->x && !point->y)
+		return ;
+	if (point->y)
 	{
-		zero += n;
-		return (write(1, &zero, 1));
+		while (tmp && (tmp->y != (point->y) - 1 || tmp->x != point->x))
+			tmp = tmp->next;
+		if (tmp)
+			draw_line(params, get_point(params, *tmp, 1),
+				get_point(params, *point, 1));
 	}
-	len += ft_printnbr(n / 10);
-	zero += n % 10;
-	write (1, &zero, 1);
-	len++;
-	return (len);
-}
-
-int	ft_print_hex(unsigned long n, int up)
-{
-	char	*set;
-
-	set = "ABCDEF";
-	if (n < 10)
-		return (ft_printnbr(n));
-	else if (up == 0)
-		return (ft_printchar(set[n - 10] + 32));
-	return (ft_printchar(set[n - 10]));
-}
-
-int	ft_print_x(unsigned long n, int up)
-{
-	if (n < 16)
-		return (ft_print_hex(n, up));
-	return (ft_print_x(n / 16, up) + ft_print_hex(n % 16, up));
+	tmp = *map;
+	if (point->x)
+	{
+		while (tmp && (tmp->x != (point->x) - 1 || tmp->y != point->y))
+			tmp = tmp->next;
+		if (tmp)
+			draw_line(params, get_point(params, *tmp, 1),
+				get_point(params, *point, 1));
+	}
 }
